@@ -82,6 +82,18 @@ button span { font-size: 20px; font-weight: 400; }
 .result-panel p { position: relative; z-index: 1; max-width: 340px; margin: 0; color: #4f6657; font-size: 14px; line-height: 1.9; }
 .result-panel .result-name { margin-top: 16px; overflow-wrap: anywhere; }
 .result-decoration { position: absolute; right: -30px; bottom: -87px; color: #d0e3ca; font-size: 260px; line-height: 1; }
+.military-panel { width: min(100%, 460px); margin-top: 24px; padding: 28px; border: 1px solid #e1e8e0; border-radius: 17px; background: #fff; overflow-wrap: anywhere; }
+.military-panel h2 { margin: 14px 0; font-size: 20px; }
+.military-panel p, .military-rules { color: #4f6657; font-size: 13px; line-height: 1.9; }
+.military-label strong { color: #234f37; font-size: 18px; }
+.military-measurements { display: flex; flex-wrap: wrap; gap: 16px 24px; margin: 20px 0; }
+.military-measurements dt { color: #607267; font-size: 12px; }
+.military-measurements dd { margin: 5px 0 0; font-weight: 700; }
+.military-rules summary { cursor: pointer; font-weight: 700; }
+.military-rules ul { padding-left: 20px; }
+.military-panel a { color: #285a43; text-underline-offset: 3px; }
+.military-panel a:focus-visible, .military-rules summary:focus-visible { outline: 3px solid #94b589; outline-offset: 3px; }
+.military-panel .military-source, .military-panel .military-disclaimer { padding-top: 14px; border-top: 1px solid #e1e5dc; font-size: 12px; }
 .information { display: grid; grid-template-columns: 1fr 1fr; gap: 10%; padding: 40px 0 45px; border-top: 1px solid #e1e5dc; }
 .about h2 { margin: 17px 0 16px; font-size: 28px; letter-spacing: -.04em; }
 .about p { max-width: 430px; margin: 0; color: #708078; font-size: 14px; line-height: 2; }
@@ -106,6 +118,7 @@ footer span { letter-spacing: .14em; }
   .hero-side { max-width: 580px; }
   .illustration { width: min(100%, 340px); }
   .result-panel { width: 100%; min-height: 0; }
+  .military-panel { width: 100%; }
   .information { grid-template-columns: 1fr; gap: 28px; }
 }
 @media (max-width: 440px) {

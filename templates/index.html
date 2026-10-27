@@ -93,6 +93,40 @@
                 <p>{{ result.advice }}</p>
                 <span class="result-decoration" aria-hidden="true">✳</span>
               </section>
+              <section class="military-panel" aria-labelledby="military-title" aria-live="polite">
+                <span class="panel-kicker">MILITARY SERVICE / 兵役參考</span>
+                <h2 id="military-title">兵役體位初步判斷</h2>
+                {% if result.military.label %}
+                  <p class="military-label">依身高、體重初判：<strong>{{ result.military.label }}</strong></p>
+                  <p>{{ result.military.reason }}</p>
+                  <dl class="military-measurements">
+                    <div><dt>採計身高</dt><dd>{{ result.military.height }} 公分</dd></div>
+                    <div><dt>採計體重</dt><dd>{{ result.military.weight }} 公斤</dd></div>
+                    <div><dt>兵役 BMI</dt><dd>{{ result.military.bmi }}</dd></div>
+                  </dl>
+                {% else %}
+                  <p class="military-label"><strong>無法提供兵役初步判斷</strong></p>
+                  <p>{{ result.military.reason }}</p>
+                {% endif %}
+                <p>兵役採計身高捨去不足 1 公分的尾數、體重捨去小數第一位後的尾數，再將 BMI 四捨五入至小數第一位，因此可能與上方健康 BMI 不同。</p>
+                <details class="military-rules">
+                  <summary>查看身高、BMI 分類門檻</summary>
+                  <ul>
+                    <li>採計身高 154 公分以下或 196 公分以上：免役體位。</li>
+                    <li>採計身高 155 至 195 公分，BMI 小於 15 或大於 35：免役體位。</li>
+                    <li>採計身高 155 至 157 公分，BMI 為 15 至 35（含端點）：替代役體位。</li>
+                    <li>採計身高 158 至 195 公分，BMI 為 15 至未滿 16.5，或大於 32 至 35：替代役體位。</li>
+                    <li>採計身高 158 至 195 公分，BMI 為 16.5 至 32（含端點）：常備役體位。</li>
+                  </ul>
+                </details>
+                <p class="military-source">
+                  依據中華民國
+                  <a href="{{ military_standard.url }}" rel="noreferrer">《體位區分標準》</a>
+                  <a href="{{ military_standard.table_url }}" rel="noreferrer">附表一（PDF，第 86 頁／表列第 88 頁）</a>；
+                  {{ military_standard.version }}，資料查核日 {{ military_standard.checked_on }}。
+                </p>
+                <p class="military-disclaimer">僅供役齡男子依身高、體重初步參考，不涵蓋疾病、其他體檢項目、役期或徵集資格，亦非完整體位結論。正式體位仍以主管機關體檢及判定為準。規則不會即時連線更新；如適用日期、身分或規則版本不符，請向戶籍地役政單位確認，不應據此判定。</p>
+              </section>
             {% else %}
               <div class="illustration" aria-hidden="true">
                 <span class="illustration-ring ring-one"></span>

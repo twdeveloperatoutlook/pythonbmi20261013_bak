@@ -1,4 +1,5 @@
 import math
+from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP, localcontext
 
 from flask import Flask, render_template, request
 
@@ -50,6 +51,60 @@ def parse_positive_number(value):
     return number if math.isfinite(number) and number > 0 else None
 
 
+MILITARY_STANDARD = {
+    "version": "民國 112 年 5 月 30 日（2023-05-30）修正發布",
+    "checked_on": "2026-10-27",
+    "url": "https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=F0040018",
+    "table_url": "https://law.moj.gov.tw/LawClass/LawGetFile.ashx?FileId=0000342747&lan=C",
+}
+
+
+def military_guidance(height, weight):
+    unavailable = {
+        "label": None,
+        "bmi": None,
+        "reason": "資料不足，請提供大於 0 的有效身高與體重。",
+    }
+    if parse_positive_number(height) is None or parse_positive_number(weight) is None:
+        return unavailable
+
+    measured_height = Decimal(str(height)).to_integral_value(rounding=ROUND_DOWN)
+    weight_decimal = Decimal(str(weight))
+    with localcontext() as context:
+        context.prec = max(28, weight_decimal.adjusted() + 7)
+        measured_weight = weight_decimal.quantize(Decimal("0.1"), rounding=ROUND_DOWN)
+        if measured_height == 0 or measured_weight == 0:
+            return {
+                **unavailable,
+                "reason": "依兵役量測規則處理後，身高或體重為 0，無法提供兵役初步判斷。",
+            }
+
+        # Legal truncation and half-up rounding differ from the health BMI display.
+        bmi = measured_weight / (measured_height / 100) ** 2
+        bmi = bmi.quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+    result = {
+        "height": f"{measured_height:.0f}",
+        "weight": f"{measured_weight:.1f}",
+        "bmi": f"{bmi:.1f}",
+    }
+    if measured_height < 155 or measured_height >= 196:
+        label = "免役體位"
+        reason = "採計身高為 154 公分以下或 196 公分以上。"
+    elif bmi < 15 or bmi > 35:
+        label = "免役體位"
+        reason = "兵役 BMI 小於 15 或大於 35。"
+    elif measured_height <= 157:
+        label = "替代役體位"
+        reason = "採計身高為 155 至 157 公分，且兵役 BMI 為 15 至 35（含端點）。"
+    elif bmi < Decimal("16.5") or bmi > 32:
+        label = "替代役體位"
+        reason = "兵役 BMI 為 15 至未滿 16.5，或大於 32 至 35。"
+    else:
+        label = "常備役體位"
+        reason = "採計身高為 158 至 195 公分，且兵役 BMI 為 16.5 至 32（含端點）。"
+    return {**result, "label": label, "reason": reason}
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     name_input = ""
@@ -85,6 +140,7 @@ def index():
                         "bmi": f"{displayed_bmi:.1f}",
                         "gauge_angle": gauge_angle(displayed_bmi),
                         **bmi_guidance(displayed_bmi),
+                        "military": military_guidance(height_input, weight_input),
                     }
 
     return render_template(
@@ -94,6 +150,7 @@ def index():
         weight_input=weight_input,
         errors=errors,
         result=result,
+        military_standard=MILITARY_STANDARD,
     )
 
 
